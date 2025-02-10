@@ -1,0 +1,8 @@
+../Core/CustomDrivers/MPU6050/mpu6050.c:35:6:mpu6050_init	2
+../Core/CustomDrivers/MPU6050/mpu6050.c:65:7:mpu6050_get_x_axis_data	2
+../Core/CustomDrivers/MPU6050/mpu6050.c:85:7:mpu6050_get_y_axis_data	2
+../Core/CustomDrivers/MPU6050/mpu6050.c:105:7:mpu6050_get_z_axis_data	2
+../Core/CustomDrivers/MPU6050/mpu6050.c:121:7:mpu6050_get_temperature_data	2
+../Core/CustomDrivers/MPU6050/mpu6050.c:149:6:who_am_i	2
+../Core/CustomDrivers/MPU6050/mpu6050.c:168:9:read_register	1
+../Core/CustomDrivers/MPU6050/mpu6050.c:186:6:write_register	1

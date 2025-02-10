@@ -1,0 +1,3 @@
+../Core/CustomDrivers/BLE/HM10.c:17:6:hm10_uart_send_tx	2
+../Core/CustomDrivers/BLE/HM10.c:26:6:hm10_uart_handle_tx	1
+../Core/CustomDrivers/BLE/HM10.c:31:6:hm10_uart_handle_rx	3

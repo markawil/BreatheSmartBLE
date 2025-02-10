@@ -1,0 +1,9 @@
+../Core/CustomDrivers/CCS811/ccs811.c:23:6:ccs811_init	3
+../Core/CustomDrivers/CCS811/ccs811.c:55:6:ccs811_reset	1
+../Core/CustomDrivers/CCS811/ccs811.c:61:6:ccs811_check_data_ready	2
+../Core/CustomDrivers/CCS811/ccs811.c:73:6:set_measurement_mode	1
+../Core/CustomDrivers/CCS811/ccs811.c:80:6:set_temp_humidity	3
+../Core/CustomDrivers/CCS811/ccs811.c:103:10:ccs811_get_CO2_PPM	1
+../Core/CustomDrivers/CCS811/ccs811.c:111:10:ccs811_get_TVOC_PPB	1
+../Core/CustomDrivers/CCS811/ccs811.c:119:10:readBaseLine	1
+../Core/CustomDrivers/CCS811/ccs811.c:127:6:write_baseline	1
