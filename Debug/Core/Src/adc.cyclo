@@ -1,4 +1,0 @@
-../Core/Src/adc.c:49:6:MX_ADC1_Init	3
-../Core/Src/adc.c:105:6:HAL_ADC_MspInit	3
-../Core/Src/adc.c:150:6:HAL_ADC_MspDeInit	2
-../Core/Src/adc.c:174:6:pollADC	2

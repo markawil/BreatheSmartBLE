@@ -1,6 +1,0 @@
-../Core/Src/i2c.c:42:6:MX_I2C1_Init	4
-../Core/Src/i2c.c:90:6:MX_I2C3_Init	4
-../Core/Src/i2c.c:146:6:HAL_I2C_MspInit	5
-../Core/Src/i2c.c:227:6:HAL_I2C_MspDeInit	3
-../Core/Src/i2c.c:274:6:print_temperature_data	1
-../Core/Src/i2c.c:298:6:print_device_name	2
