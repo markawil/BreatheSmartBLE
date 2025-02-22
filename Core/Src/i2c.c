@@ -126,10 +126,18 @@ void MX_I2C3_Init(void)
   }
   /* USER CODE BEGIN I2C3_Init 2 */
 
+  ssd1306_set_LCD(LCD_NUMBER_1); // not needed, but good to be explicit about which ssd1306 we're init'ing
   ssd1306_Init();
 
   draw_github_intro();
   HAL_Delay(1000); // let the logo stay on the screen for a second
+
+  ssd1306_set_LCD(LCD_NUMBER_2); // now init the 2nd LCD
+  ssd1306_Init();
+
+  draw_github_intro();
+  HAL_Delay(1000); // let the logo stay on the screen for a second
+
 
   /* USER CODE END I2C3_Init 2 */
 
@@ -265,6 +273,8 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
 
 void print_temperature_data(void)
 {
+	ssd1306_set_LCD(LCD_NUMBER_1);
+
 	float temp_value = mpu6050_get_temperature_data();
 	// comes in as C, convert to F
 	// (C × 9/5) + 32
@@ -283,6 +293,23 @@ void print_temperature_data(void)
 	char temp_F[MAX_BUFFER_LEN] = "";
 	snprintf(temp_F, MAX_BUFFER_LEN, "Temp: %.1fF", temp_value_F);
 	ssd1306_WriteString(temp_F, Font_11x18, White);
+}
+
+void print_device_name(const char *name)
+{
+	// output to the LCD display
+	ssd1306_set_LCD(LCD_NUMBER_2);
+	ssd1306_Fill(Black);
+
+	if (strlen(name) > 0)
+	{
+		ssd1306_SetCursor(2, 0);
+		ssd1306_WriteString("Connected:", Font_11x18, White);
+		ssd1306_SetCursor(2, 20);
+		ssd1306_WriteString((char*)name, Font_11x18, White);
+	}
+
+	ssd1306_UpdateScreen();
 }
 
 /* USER CODE END 1 */

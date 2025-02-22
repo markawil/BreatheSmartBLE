@@ -9,14 +9,32 @@ void ssd1306_Reset(void) {
     /* for I2C - do nothing */
 }
 
+// LCD number currently selected
+static LCD_NUMBER current_lcd = LCD_NUMBER_1;
+
 // Send a byte to the command register
 void ssd1306_WriteCommand(uint8_t byte) {
-    HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x00, 1, &byte, 1, HAL_MAX_DELAY);
+	if (current_lcd == LCD_NUMBER_1)
+	{
+		HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR_1, 0x00, 1, &byte, 1, HAL_MAX_DELAY);
+	}
+	else
+	{
+		HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR_2, 0x00, 1, &byte, 1, HAL_MAX_DELAY);
+	}
 }
 
 // Send data
 void ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
-    HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x40, 1, buffer, buff_size, HAL_MAX_DELAY);
+
+	if (current_lcd == LCD_NUMBER_1)
+	{
+		HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR_1, 0x40, 1, buffer, buff_size, HAL_MAX_DELAY);
+	}
+	else
+	{
+		HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR_2, 0x40, 1, buffer, buff_size, HAL_MAX_DELAY);
+	}
 }
 
 #elif defined(SSD1306_USE_SPI)
@@ -51,7 +69,6 @@ void ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
 #else
 #error "You should define SSD1306_USE_SPI or SSD1306_USE_I2C macro"
 #endif
-
 
 // Screenbuffer
 static uint8_t SSD1306_Buffer[SSD1306_BUFFER_SIZE];
@@ -169,6 +186,12 @@ void ssd1306_Init(void) {
     SSD1306.CurrentY = 0;
     
     SSD1306.Initialized = 1;
+}
+
+/* set the LCD you want to write to next */
+void ssd1306_set_LCD(LCD_NUMBER lcd)
+{
+	current_lcd = lcd;
 }
 
 /* Fill the whole screen with the given color */

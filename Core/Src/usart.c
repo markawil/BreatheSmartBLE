@@ -23,11 +23,14 @@
 /* USER CODE BEGIN 0 */
 
 #include "HM10.h"
+#include "i2c.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 void serial_uart_handle_tx();
 void serial_uart_handle_rx();
+void hm10_uart_handle_rx_2();
 
 #define MAX_BUFFER_LEN 100u
 
@@ -39,6 +42,9 @@ uint8_t uart2_rx_data;
 uint8_t uart2_tx_buffer[MAX_BUFFER_LEN];
 uint8_t uart2_rx_buffer[MAX_BUFFER_LEN];
 uint32_t counter_s = 0; // count how many bytes are received
+
+const char* ok_response = "OK+";
+static bool ok_received = false;
 
 /* USER CODE END 0 */
 
@@ -148,7 +154,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_10;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -291,6 +297,18 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	// if from the HCO5 or HM10 Bluetooth module
 	if (huart->Instance == huart1.Instance)
 	{
+//		for (uint8_t i=0; i<20; i++)
+//		{
+//			if (uart1_rx_data[i] != '\0')
+//			{
+//				hm10_uart_handle_rx(uart1_rx_data[i]);
+//			}
+//			else
+//			{
+//				break;
+//			}
+//		}
+
 		hm10_uart_handle_rx(uart1_rx_data);
 		HAL_UART_Receive_IT(&huart1, &uart1_rx_data, 1);
 	}
@@ -303,10 +321,30 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
-	char* error_msg = "UART error occurred.";
+	char *error_msg = "UART error occurred.";
+
+	uint32_t error = huart->ErrorCode;
 
 	if (huart->Instance == huart1.Instance)
 	{
+		if(error & HAL_UART_ERROR_FE)
+		{
+			//frame error detected
+			__HAL_UART_CLEAR_FLAG(huart, UART_FLAG_FE); //clear frame error flag
+
+		}
+		else if(error & HAL_UART_ERROR_ORE)
+		{
+			//overrun error
+			__HAL_UART_CLEAR_FLAG(huart, UART_FLAG_ORE); //clear overrun flag
+			__HAL_UART_FLUSH_DRREGISTER(huart); //flush data
+		}
+		else if(error & HAL_UART_ERROR_PE)
+		{
+			// parity error occurred
+			__HAL_UART_CLEAR_FLAG(huart, UART_FLAG_PE); //clear frame error flag
+		}
+
 		error_msg = "HM10 UART error occurred.";
 		serial_uart_send_tx(error_msg, sizeof(error_msg));
 	}
@@ -374,6 +412,20 @@ void serial_uart_handle_rx()
 	memset(uart2_tx_buffer, '\0', (size_t)MAX_BUFFER_LEN);
 	memset(uart2_rx_buffer, '\0', (size_t)MAX_BUFFER_LEN);
 	counter_s = 0; // reset the counter to be ready for new data.
+}
+
+void hm10_uart_handle_rx_2()
+{
+	if (strcmp(ok_response, (char*)uart1_rx_data) == 0)
+	{
+		ok_received = true;
+	}
+	else
+	{
+		ok_received = false;
+	}
+
+	memset(uart1_rx_data, '\0', (size_t)3);
 }
 
 /* USER CODE END 1 */

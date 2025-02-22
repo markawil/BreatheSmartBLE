@@ -1,5 +1,6 @@
 ../Core/Src/i2c.c:42:6:MX_I2C1_Init	8	static
 ../Core/Src/i2c.c:90:6:MX_I2C3_Init	8	static
-../Core/Src/i2c.c:138:6:HAL_I2C_MspInit	144	static
-../Core/Src/i2c.c:219:6:HAL_I2C_MspDeInit	16	static
-../Core/Src/i2c.c:266:6:print_temperature_data	232	static
+../Core/Src/i2c.c:146:6:HAL_I2C_MspInit	144	static
+../Core/Src/i2c.c:227:6:HAL_I2C_MspDeInit	16	static
+../Core/Src/i2c.c:274:6:print_temperature_data	232	static
+../Core/Src/i2c.c:298:6:print_device_name	24	static

@@ -1,3 +1,4 @@
-../Core/CustomDrivers/BLE/HM10.c:17:6:hm10_uart_send_tx	32	static
-../Core/CustomDrivers/BLE/HM10.c:26:6:hm10_uart_handle_tx	4	static
-../Core/CustomDrivers/BLE/HM10.c:31:6:hm10_uart_handle_rx	16	static
+../Core/CustomDrivers/BLE/HM10.c:27:6:hm10_uart_send_tx	32	static
+../Core/CustomDrivers/BLE/HM10.c:36:6:hm10_uart_handle_tx	4	static
+../Core/CustomDrivers/BLE/HM10.c:41:6:hm10_uart_handle_rx	16	static
+../Core/CustomDrivers/BLE/HM10.c:86:6:parse_OK_cmd	16	static

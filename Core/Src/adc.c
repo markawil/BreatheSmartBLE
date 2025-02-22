@@ -184,6 +184,7 @@ void pollADC(void)
 		serial_uart_send_tx(buffer, 100);
 
 		// output to the OLED display
+		ssd1306_set_LCD(LCD_NUMBER_1);
 		ssd1306_SetCursor(2, 20);
 		char volts_msg[MAX_BUFFER_LEN] = "";
 		snprintf(volts_msg, MAX_BUFFER_LEN, "ADC: %.1fV", voltage);

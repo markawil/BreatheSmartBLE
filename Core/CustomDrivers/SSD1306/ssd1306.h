@@ -63,8 +63,12 @@ _BEGIN_STD_C
 #define SSD1306_I2C_PORT        hi2c3
 #endif
 
-#ifndef SSD1306_I2C_ADDR
-#define SSD1306_I2C_ADDR        (0x3C << 1)
+#ifndef SSD1306_I2C_ADDR_1
+#define SSD1306_I2C_ADDR_1      (0x3C << 1)
+#endif
+
+#ifndef SSD1306_I2C_ADDR_2
+#define SSD1306_I2C_ADDR_2      (0x3D << 1)
 #endif
 
 /* ^^^ I2C config ^^^ */
@@ -139,6 +143,12 @@ typedef struct {
     uint8_t DisplayOn;
 } SSD1306_t;
 
+
+typedef enum {
+	LCD_NUMBER_1 = 0x00,
+	LCD_NUMBER_2 = 0x01
+}LCD_NUMBER;
+
 typedef struct {
     uint8_t x;
     uint8_t y;
@@ -154,6 +164,7 @@ typedef struct {
 
 // Procedure definitions
 void ssd1306_Init(void);
+void ssd1306_set_LCD(LCD_NUMBER);
 void ssd1306_Fill(SSD1306_COLOR color);
 void ssd1306_UpdateScreen(void);
 void ssd1306_DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color);

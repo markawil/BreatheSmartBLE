@@ -46,6 +46,7 @@ void MX_I2C3_Init(void);
 /* USER CODE BEGIN Prototypes */
 
 void print_temperature_data(void);
+void print_device_name(const char *name);
 
 /* USER CODE END Prototypes */
 
