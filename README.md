@@ -1,4 +1,4 @@
-BreathSmart is an embedded project on an STM32 MCU with the intended purpose of showing air quality inside indoor environemnts.
+BreatheSmart is an embedded project on an STM32 MCU with the intended purpose of showing air quality inside indoor environemnts.
 
 Phase 1 is the embedded system with air quality sensors on an i2C shared bus, outputting to an OLED display.
 
