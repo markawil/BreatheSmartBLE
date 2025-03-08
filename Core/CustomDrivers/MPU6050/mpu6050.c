@@ -14,9 +14,6 @@
 #define MPU6050_ADDRESS MPU6050_DEV_ADD_LOW // device address because pin is set to low.
 #define WHO_AM_I_VALUE 0x68u // default value of the device register
 
-// Max timeout in microseconds
-#define I2C_MAX_TIMEOUT 100u
-
 static bool device_init_complete_s = false;
 
 extern I2C_HandleTypeDef hi2c1;
@@ -24,8 +21,8 @@ extern I2C_HandleTypeDef hi2c1;
 // private function prototypes
 bool who_am_i(void);
 bool write_accel_config(void);
-uint8_t read_register(uint8_t reg_add);
-bool write_register(uint8_t reg_add, uint8_t reg_val);
+uint8_t read_MPU6050_register(uint8_t reg_add);
+bool write_MPU6050_register(uint8_t reg_add, uint8_t reg_val);
 
 /******************* PUBLIC FUNCTIONS *******************/
 /*!
@@ -42,17 +39,17 @@ bool mpu6050_init(void)
 
 	// Need to take the accelerometer out of sleep mode.
 	uint8_t data = 0x00;
-	bool pwr_mgmt_write = write_register(MPU6050_REG_PWR_MGMT_1, data);
+	bool pwr_mgmt_write = write_MPU6050_register(MPU6050_REG_PWR_MGMT_1, data);
 	assert(pwr_mgmt_write);
 
 	// Set data rate to 1KHz by writing MPU6050_REG_SMPRT_DIV register.
 	data = 0x07;
-	bool set_data_rate = write_register(MPU6050_REG_SMPRT_DIV, data);
+	bool set_data_rate = write_MPU6050_register(MPU6050_REG_SMPRT_DIV, data);
 	assert(set_data_rate);
 
 	// Set accelerometer configuration to +-2g.
 	data = 0x00;
-	bool set_accel = write_register(MPU6050_REG_ACCEL_CONFIG, data);
+	bool set_accel = write_MPU6050_register(MPU6050_REG_ACCEL_CONFIG, data);
 	assert(set_accel);
 
 	return true;
@@ -70,8 +67,8 @@ float mpu6050_get_x_axis_data(void)
 	}
 
 	uint16_t x_axis = 0u; // resultant value holder used for combining L and H 8 bit values
-	uint8_t x_axis_l = read_register(MPU6050_REG_ACCEL_XOUT_L);
-	uint8_t x_axis_h = read_register(MPU6050_REG_ACCEL_XOUT_H);
+	uint8_t x_axis_l = read_MPU6050_register(MPU6050_REG_ACCEL_XOUT_L);
+	uint8_t x_axis_h = read_MPU6050_register(MPU6050_REG_ACCEL_XOUT_H);
 	// combine the 2 with a bit shift and an or operator
 	x_axis = ((int16_t)x_axis_h << 8) | x_axis_l;
 
@@ -90,8 +87,8 @@ float mpu6050_get_y_axis_data(void)
 	}
 
 	uint16_t y_axis = 0u; // resultant value holder used for combining L and H 8 bit values
-	uint8_t y_axis_l = read_register(MPU6050_REG_ACCEL_YOUT_L);
-	uint8_t y_axis_h = read_register(MPU6050_REG_ACCEL_YOUT_H);
+	uint8_t y_axis_l = read_MPU6050_register(MPU6050_REG_ACCEL_YOUT_L);
+	uint8_t y_axis_h = read_MPU6050_register(MPU6050_REG_ACCEL_YOUT_H);
 	// combine the 2 with a bit shift and an or operator
 	y_axis = ((int16_t)y_axis_h << 8) | y_axis_l;
 
@@ -110,8 +107,8 @@ float mpu6050_get_z_axis_data(void)
 	}
 
 	uint16_t z_axis = 0u; // resultant value holder used for combining L and H 8 bit values
-	uint8_t z_axis_l = read_register(MPU6050_REG_ACCEL_ZOUT_L);
-	uint8_t z_axis_h = read_register(MPU6050_REG_ACCEL_ZOUT_H);
+	uint8_t z_axis_l = read_MPU6050_register(MPU6050_REG_ACCEL_ZOUT_L);
+	uint8_t z_axis_h = read_MPU6050_register(MPU6050_REG_ACCEL_ZOUT_H);
 	// combine the 2 with a bit shift and an or operator
 	z_axis = ((int16_t)z_axis_h << 8) | z_axis_l;
 
@@ -126,8 +123,8 @@ float mpu6050_get_temperature_data(void)
 	}
 
 	short temperature = 0; // resultant value holder used for combining L and H 8 bit values
-	uint8_t temp_l = read_register(MPU6050_REG_TEMP_OUT_L);
-	uint8_t temp_h = read_register(MPU6050_REG_TEMP_OUT_H);
+	uint8_t temp_l = read_MPU6050_register(MPU6050_REG_TEMP_OUT_L);
+	uint8_t temp_h = read_MPU6050_register(MPU6050_REG_TEMP_OUT_H);
 	// combine the 2 with a bit shift and an or operator
 	temperature = (temp_h << 8) | temp_l;
 
@@ -151,7 +148,7 @@ bool who_am_i(void)
 	bool device_present = false;
 	uint8_t reg_value = 0x00;
 
-	reg_value = read_register(MPU6050_REG_WHO_AM_I);
+	reg_value = read_MPU6050_register(MPU6050_REG_WHO_AM_I);
 	if (reg_value == WHO_AM_I_VALUE)
 	{
 		device_present = true;
@@ -165,11 +162,11 @@ bool who_am_i(void)
  * \param[in] reg_add - Address of the register we want to read.
  * \return    reg_val - Value of the register we read from.
  */
-uint8_t read_register(uint8_t reg_add)
+uint8_t read_MPU6050_register(uint8_t reg_add)
 {
 	uint8_t reg_value = 0x00;
 
-	HAL_StatusTypeDef i2c_rx_okay = HAL_I2C_Mem_Read(&hi2c1, MPU6050_ADDRESS, reg_add, 1, &reg_value, 1, I2C_MAX_TIMEOUT);
+	HAL_StatusTypeDef i2c_rx_okay = HAL_I2C_Mem_Read(&hi2c1, MPU6050_ADDRESS, reg_add, 1, &reg_value, 1, MPU6050_I2C_MAX_TIMEOUT);
 	if (i2c_rx_okay != HAL_OK)
 	{
 		// handle the error
@@ -183,9 +180,9 @@ uint8_t read_register(uint8_t reg_add)
  * \param[in] reg_val - Value of the register we want to write.
  * \return    True is the register write was successful, false if not.
  */
-bool write_register(uint8_t reg_add, uint8_t reg_val)
+bool write_MPU6050_register(uint8_t reg_add, uint8_t reg_val)
 {
-	HAL_StatusTypeDef i2c_tx_okay = HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, reg_add, 1, &reg_val, 1, I2C_MAX_TIMEOUT);
+	HAL_StatusTypeDef i2c_tx_okay = HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, reg_add, 1, &reg_val, 1, MPU6050_I2C_MAX_TIMEOUT);
 	if (i2c_tx_okay != HAL_OK)
 	{
 		// handle the error

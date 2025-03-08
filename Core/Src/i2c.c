@@ -83,6 +83,16 @@ void MX_I2C1_Init(void)
 	  // TODO: handle init error for mpu6050
   }
 
+//  if (bme280_init() == false)
+//  {
+//	  // TODO: handle BME280 init failure
+//  }
+
+  if (ccs811_init() == false)
+  {
+	  // TODO: handle init error for ccs811
+  }
+
   /* USER CODE END I2C1_Init 2 */
 
 }
@@ -137,7 +147,7 @@ void MX_I2C3_Init(void)
 
   draw_github_intro();
   HAL_Delay(1000); // let the logo stay on the screen for a second
-
+  print_device_name("");
 
   /* USER CODE END I2C3_Init 2 */
 
@@ -308,8 +318,18 @@ void print_device_name(const char *name)
 		ssd1306_SetCursor(2, 20);
 		ssd1306_WriteString((char*)name, Font_11x18, White);
 	}
+	else
+	{
+		ssd1306_SetCursor(2, 0);
+		ssd1306_WriteString("Disconnected", Font_7x10, White);
+	}
 
 	ssd1306_UpdateScreen();
+}
+
+void pollCCS811()
+{
+	uint16_t co2 = ccs811_get_CO2_PPM();
 }
 
 /* USER CODE END 1 */

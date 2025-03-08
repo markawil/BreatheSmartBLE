@@ -24,6 +24,7 @@
 #include <stdbool.h>
 
 #define CCS811_DEV_ADD = 0x5A // device address in default mode
+#define CCS811_I2C_MAX_TIMEOUT 100u
 
 /*
  *  Initialize the CCS811, returns false if something in init failed.

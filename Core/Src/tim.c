@@ -160,6 +160,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 	print_temperature_data();
 	pollADC();
+	pollCCS811();
 	ssd1306_UpdateScreen();
 }
 

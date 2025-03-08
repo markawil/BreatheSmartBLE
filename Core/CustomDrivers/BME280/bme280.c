@@ -52,7 +52,7 @@ bool bme280_init(void)
 		success = get_calib_data();
 	}
 
-	device_init_complete_s = true;
+	device_init_complete_s = success;
 
 	return success;
 }

@@ -13,6 +13,7 @@
 
 #define MPU6050_DEV_ADD_LOW  0xD0u // Device address of the MPU6050 when pin AD0 is pulled low
 #define MPU6050_DEV_ADD_HIGH 0xE0u // Device address of the MPU6050 when pin AD0 is pulled high
+#define MPU6050_I2C_MAX_TIMEOUT 100u
 
 bool mpu6050_init(void);
 
