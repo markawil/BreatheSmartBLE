@@ -46,7 +46,7 @@ bool ccs811_check_data_ready(void);
 
 /*
  * CO2 concentration(ppm)	Impact on human-beings
- * 	    < 500					normal
+ * 	    < 						normal
  *		500-1000                uncomfortable
  *	    1000-2500 				tired
  *	    2500-5000 			    unhealthy

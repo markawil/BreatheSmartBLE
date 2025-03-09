@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+extern UART_HandleTypeDef huart1;
+
 void parse_OK_cmd(uint8_t next_byte);
 
 const char hm10_error[] = "Error! Something failed for HM10 module\r\n";
@@ -23,19 +25,53 @@ static uint8_t rx_data_s; // holds last character to be received
 static uint8_t rx_name_buffer_s[100];
 static uint8_t name_buffer_counter = 0;
 
+/*
+ * typedef enum {
+	SENSOR_DATA_TEMP = 0x00,
+	SENSOR_DATA_TVOC = 0x01,
+	SENSOR_DATA_CO2  = 0x02,
+	SENSOR_DATA_HUM  = 0x03,
+	SENSOR_DATA_PRES = 0x04,
+	SENSOR_DATA_BATT = 0x05
+}SENSOR_DATA_TYPE;
+ */
 
-void hm10_uart_send_tx(UART_HandleTypeDef *huart, const char *buffer, uint16_t buffer_len)
+
+void hm10_send_sensor_data(float data, SENSOR_DATA_TYPE type, uint8_t *tx_buffer)
 {
-	HAL_StatusTypeDef result = HAL_UART_Transmit(huart, (uint8_t *)buffer, buffer_len, 100);
+	switch(type)
+	{
+	case SENSOR_DATA_TEMP:
+		snprintf((char *)tx_buffer, 20, "00:%.1f", data);
+		break;
+	case SENSOR_DATA_TVOC:
+		snprintf((char *)tx_buffer, 20, "01:%.1f", data);
+		break;
+	case SENSOR_DATA_CO2:
+		snprintf((char *)tx_buffer, 20, "02:%.1f", data);
+		break;
+	case SENSOR_DATA_HUM:
+		snprintf((char *)tx_buffer, 20, "03:%.1f", data);
+		break;
+	case SENSOR_DATA_PRES:
+		snprintf((char *)tx_buffer, 20, "04:%.1f", data);
+		break;
+	case SENSOR_DATA_BATT:
+		snprintf((char *)tx_buffer, 20, "05:%.1f", data);
+		break;
+	default:
+		return;
+	}
+
+	// Transmit the formatted string over the HM10
+	HAL_StatusTypeDef result = HAL_UART_Transmit(&huart1, tx_buffer, 20, 100);
 	if (result != HAL_OK)
 	{
 		show_error(hm10_error, sizeof(hm10_error), SerialUART_Out);
 	}
-}
 
-void hm10_uart_handle_tx()
-{
-	// clear the TX buffer after sending
+	// clear the buffer for next transfer
+	memset(tx_buffer, '\0', (size_t)MAX_BUFFER_LEN);
 }
 
 void hm10_uart_handle_rx(uint8_t rx_data)

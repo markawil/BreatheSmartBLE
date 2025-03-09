@@ -30,6 +30,7 @@
 #include "bme280.h"
 #include "ccs811.h"
 #include "const.h"
+#include "HM10.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -37,6 +38,8 @@
 
 I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c3;
+
+uint8_t ccs811_init_count = 0;
 
 /* I2C1 init function */
 void MX_I2C1_Init(void)
@@ -83,15 +86,25 @@ void MX_I2C1_Init(void)
 	  // TODO: handle init error for mpu6050
   }
 
-//  if (bme280_init() == false)
+//  if (ccs811_init() == false)
 //  {
-//	  // TODO: handle BME280 init failure
+//	  // TODO: handle init error for ccs811
 //  }
 
-  if (ccs811_init() == false)
-  {
-	  // TODO: handle init error for ccs811
-  }
+//  	while(ccs811_init() == false)
+//  	{
+//  		HAL_Delay(1000); // wait and keep trying to init until device ready
+//  		ccs811_init_count++;
+//  		if (ccs811_init_count > 5) // try 5 times in 5 seconds otherwise move on.
+//  		{
+//  			break;
+//  		}
+//  	}
+
+  	//  if (bme280_init() == false)
+  	//  {
+  	//	  // TODO: handle BME280 init failure
+  	//  }
 
   /* USER CODE END I2C1_Init 2 */
 
@@ -297,17 +310,20 @@ void print_temperature_data(void)
 	uint16_t temp_buffer_len = strlen(temp_msg);
 	serial_uart_send_tx(temp_msg, temp_buffer_len);
 
+	// output over BLE on the HM10
+	hm10_uart_send_tx(temp_value_F, SENSOR_DATA_TEMP);
+
 	// output to the OLED display
 	ssd1306_Fill(Black);
 	ssd1306_SetCursor(2, 0);
 	char temp_F[MAX_BUFFER_LEN] = "";
-	snprintf(temp_F, MAX_BUFFER_LEN, "Temp: %.1fF", temp_value_F);
+	snprintf(temp_F, MAX_BUFFER_LEN, "Temp:%.1fF", temp_value_F);
 	ssd1306_WriteString(temp_F, Font_11x18, White);
 }
 
 void print_device_name(const char *name)
 {
-	// output to the LCD display
+	// output to the 2nd OLED display lines 1 and 2
 	ssd1306_set_LCD(LCD_NUMBER_2);
 	ssd1306_Fill(Black);
 
@@ -329,7 +345,49 @@ void print_device_name(const char *name)
 
 void pollCCS811()
 {
-	uint16_t co2 = ccs811_get_CO2_PPM();
+	uint16_t co2 = 400;
+	uint16_t tvoc = 25;
+
+//	if (ccs811_check_data_ready() && (ccs811_init_count < 6))
+//	{
+//		co2 = ccs811_get_CO2_PPM();
+//		tvoc = ccs811_get_TVOC_PPB();
+//		write_baseline(0x447B);
+//		HAL_Delay(250);
+//	}
+
+	ssd1306_set_LCD(LCD_NUMBER_1);
+
+	// output CO2 and TVOC values
+
+	ssd1306_SetCursor(2, 20);
+	char co2_msg[MAX_BUFFER_LEN] = "";
+	if (co2 == 0)
+	{
+		snprintf(co2_msg, MAX_BUFFER_LEN, "CO2:---ppm");
+	}
+	else
+	{
+		snprintf(co2_msg, MAX_BUFFER_LEN, "CO2:%dppm", co2);
+	}
+	ssd1306_WriteString(co2_msg, Font_11x18, White);
+
+	ssd1306_SetCursor(2, 40);
+	char tvoc_buffer[MAX_BUFFER_LEN] = "";
+	if (tvoc == 0)
+	{
+		snprintf(tvoc_buffer, MAX_BUFFER_LEN, "TVOC:---ppb");
+	}
+	else
+	{
+		snprintf(tvoc_buffer, MAX_BUFFER_LEN, "TVOC:%dpb", tvoc);
+	}
+
+	ssd1306_WriteString(tvoc_buffer, Font_11x18, White);
+
+	// output over BLE on the HM10
+	hm10_uart_send_tx((float)co2, SENSOR_DATA_CO2);
+	hm10_uart_send_tx((float)tvoc, SENSOR_DATA_TVOC);
 }
 
 /* USER CODE END 1 */

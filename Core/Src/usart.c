@@ -22,7 +22,6 @@
 
 /* USER CODE BEGIN 0 */
 
-#include "HM10.h"
 #include "i2c.h"
 #include <string.h>
 #include <stdio.h>
@@ -30,21 +29,20 @@
 
 void serial_uart_handle_tx();
 void serial_uart_handle_rx();
-void hm10_uart_handle_rx_2();
-
-#define MAX_BUFFER_LEN 100u
+void hm10_uart_handle_tx();
 
 // receive buffers
 uint8_t uart1_rx_data;
 uint8_t uart2_rx_data;
+
+// transmit buffer for uart1(HM10 BLE)
+uint8_t uart1_tx_buffer[MAX_BUFFER_LEN];
 
 // data buffers for serial port uart2
 uint8_t uart2_tx_buffer[MAX_BUFFER_LEN];
 uint8_t uart2_rx_buffer[MAX_BUFFER_LEN];
 uint32_t counter_s = 0; // count how many bytes are received
 
-const char* ok_response = "OK+";
-static bool ok_received = false;
 
 /* USER CODE END 0 */
 
@@ -81,7 +79,14 @@ void MX_USART1_UART_Init(void)
 
   HAL_Delay(20); // delay needed to get UART working properly
 
-  HAL_UART_Receive_IT(&huart1, &uart1_rx_data, 1);
+  HAL_StatusTypeDef rx_setup_ok = HAL_UART_Receive_IT(&huart1, &uart1_rx_data, 1);
+  HAL_StatusTypeDef tx_setup_ok = HAL_UART_Transmit_IT(&huart1, uart1_tx_buffer, MAX_BUFFER_LEN);
+
+  bool uart_init_success = (tx_setup_ok == HAL_OK && rx_setup_ok == HAL_OK);
+  if (!uart_init_success)
+  {
+	  Error_Handler();
+  }
 
   /* USER CODE END USART1_Init 2 */
 
@@ -294,24 +299,13 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 // called from HAL for any UART callback setup with Interrupts.
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	// if from the HCO5 or HM10 Bluetooth module
+	// if from the HM10 Bluetooth module
 	if (huart->Instance == huart1.Instance)
 	{
-//		for (uint8_t i=0; i<20; i++)
-//		{
-//			if (uart1_rx_data[i] != '\0')
-//			{
-//				hm10_uart_handle_rx(uart1_rx_data[i]);
-//			}
-//			else
-//			{
-//				break;
-//			}
-//		}
-
 		hm10_uart_handle_rx(uart1_rx_data);
 		HAL_UART_Receive_IT(&huart1, &uart1_rx_data, 1);
 	}
+	// else from the serial uart
 	else if (huart->Instance == huart2.Instance)
 	{
 		serial_uart_handle_rx();
@@ -414,18 +408,14 @@ void serial_uart_handle_rx()
 	counter_s = 0; // reset the counter to be ready for new data.
 }
 
-void hm10_uart_handle_rx_2()
+void hm10_uart_handle_tx()
 {
-	if (strcmp(ok_response, (char*)uart1_rx_data) == 0)
-	{
-		ok_received = true;
-	}
-	else
-	{
-		ok_received = false;
-	}
+	memset(uart1_tx_buffer, '\0', (size_t)MAX_BUFFER_LEN);
+}
 
-	memset(uart1_rx_data, '\0', (size_t)3);
+void hm10_uart_send_tx(float data, SENSOR_DATA_TYPE type)
+{
+	hm10_send_sensor_data(data, type, (uint8_t*)&uart1_tx_buffer);
 }
 
 /* USER CODE END 1 */

@@ -28,6 +28,7 @@
 #include "ssd1306.h"
 #include "ssd1306_fonts.h"
 #include "const.h"
+#include "HM10.h"
 #include <stdio.h>
 
 HAL_StatusTypeDef adc_ok = HAL_BUSY;
@@ -183,12 +184,15 @@ void pollADC(void)
 		snprintf(buffer, 100, "Voltage read from ADC was: %.6f\r\n", voltage);
 		serial_uart_send_tx(buffer, 100);
 
-		// output to the OLED display
-		ssd1306_set_LCD(LCD_NUMBER_1);
-		ssd1306_SetCursor(2, 20);
+		// output to the 2nd OLED display, 3rd line
+		ssd1306_set_LCD(LCD_NUMBER_2);
+		ssd1306_SetCursor(2, 40);
 		char volts_msg[MAX_BUFFER_LEN] = "";
-		snprintf(volts_msg, MAX_BUFFER_LEN, "ADC: %.1fV", voltage);
+		snprintf(volts_msg, MAX_BUFFER_LEN, "BATT:%.1fV", voltage);
 		ssd1306_WriteString(volts_msg, Font_11x18, White);
+
+		// output over BLE on the HM10
+		hm10_uart_send_tx(voltage, SENSOR_DATA_BATT);
 	}
 	else
 	{

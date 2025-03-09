@@ -27,6 +27,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "HM10.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -46,6 +47,7 @@ void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN Prototypes */
 
 void serial_uart_send_tx(const char *buffer, uint16_t buffer_len);
+void hm10_uart_send_tx(float data, SENSOR_DATA_TYPE type);
 
 /* USER CODE END Prototypes */
 

@@ -47,8 +47,8 @@ bool ccs811_init(void)
 	// write NULL into the bootloader
 	(void)write_CCS811_register(CCS811_BOOTLOADER_APP_START, NULL, 0);
 
-	// set the measurement cycle rate to 1 second readings
-	set_measurement_mode(CCS811_MODE_1SEC);
+	// set the measurement cycle rate to .25 seconds
+	set_measurement_mode(CCS811_MODE_250ms);
 
 	// set the temperature and humidity from the temp/hum sensor
 	// (TODO) Should pull these values and not input base values

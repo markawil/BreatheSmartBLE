@@ -47,6 +47,7 @@ void MX_I2C3_Init(void);
 
 void print_temperature_data(void);
 void print_device_name(const char *name);
+void pollCCS811();
 
 /* USER CODE END Prototypes */
 
