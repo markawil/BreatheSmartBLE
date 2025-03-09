@@ -4,4 +4,8 @@ Phase 1 is the embedded system with air quality sensors on an i2C shared bus, ou
 
 Phase 2 is the incorporation of a BLE transmitter that will output the data to a recipient smart phone app.
 
+![Landing screen](https://i.imgur.com/DtleCkrl.png)
+
 Phase 3 will be the app incorporation starting with an iOS app, followed by an Android app.
+
+![Landing screen](https://i.imgur.com/DfTwHHcl.png)
