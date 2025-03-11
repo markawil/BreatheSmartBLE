@@ -86,11 +86,6 @@ void MX_I2C1_Init(void)
 	  // TODO: handle init error for mpu6050
   }
 
-//  if (ccs811_init() == false)
-//  {
-//	  // TODO: handle init error for ccs811
-//  }
-
 //  	while(ccs811_init() == false)
 //  	{
 //  		HAL_Delay(1000); // wait and keep trying to init until device ready
@@ -343,18 +338,38 @@ void print_device_name(const char *name)
 	ssd1306_UpdateScreen();
 }
 
+void pollBME280() {
+
+	float humidity = 35.0;
+	float pressure = 26.75;
+/*
+ *  use when BME280 sensor is setup and working
+	struct bme280_uncomp_data bme280_data;
+	bme280_load_temp_pressure_humidity(&bme28_data);
+
+	humidity = (float)bme280_data.humidity;
+	pressure = (float)bme280_data.pressure;
+ *
+ */
+
+	hm10_uart_send_tx((float)humidity, SENSOR_DATA_HUM);
+	hm10_uart_send_tx((float)pressure, SENSOR_DATA_PRES);
+}
+
 void pollCCS811()
 {
 	uint16_t co2 = 400;
 	uint16_t tvoc = 25;
 
-//	if (ccs811_check_data_ready() && (ccs811_init_count < 6))
-//	{
-//		co2 = ccs811_get_CO2_PPM();
-//		tvoc = ccs811_get_TVOC_PPB();
-//		write_baseline(0x447B);
-//		HAL_Delay(250);
-//	}
+	/* Use when the CCS811 sensor is working right.
+	if (ccs811_check_data_ready() && (ccs811_init_count < 6))
+	{
+		co2 = ccs811_get_CO2_PPM();
+		tvoc = ccs811_get_TVOC_PPB();
+		write_baseline(0x447B);
+		HAL_Delay(250);
+	}
+	*/
 
 	ssd1306_set_LCD(LCD_NUMBER_1);
 

@@ -179,8 +179,8 @@ bool bme280_init(void);
 /* soft resets the device, true if succeeds */
 bool bme280_soft_reset(void);
 
-/* gives back compensated and calibrated values for all 3 */
-struct bme280_calib_data bme280_get_temp_pressure_humidity(struct bme280_data *data);
+/* gives back compensated and calibrated values for all 3 in the bme280_data parameter */
+void bme280_load_temp_pressure_humidity(struct bme280_data *data);
 
 
 #endif /* CUSTOMDRIVERS_BME280_BME280_H_ */
