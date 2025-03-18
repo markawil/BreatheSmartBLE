@@ -12,8 +12,8 @@
 #define CUSTOMDRIVERS_CCS811_CCS811_REG_MAP_H_
 
 /*I2C ADDRESSES*/
-#define CCS811_I2C_ADDRESS1                      0x5A
-#define CCS811_I2C_ADDRESS2                      0x5B
+#define CCS811_I2C_ADDRESS1                      (0x5A << 1)
+#define CCS811_I2C_ADDRESS2                      (0x5B << 1)
 
 #define CCS811_REG_STATUS                        0x00
 #define CCS811_REG_MEAS_MODE                     0x01

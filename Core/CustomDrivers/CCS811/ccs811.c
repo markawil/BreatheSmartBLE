@@ -17,6 +17,7 @@ extern I2C_HandleTypeDef hi2c1;
 
 void set_measurement_mode(CCS811_MODE mode);
 void set_temp_humidity(float temperature, float humidity);
+void set_app_start();
 
 // private function prototypes
 bool write_CCS811_register(uint8_t reg_add, uint8_t *reg_val, uint16_t size);
@@ -28,12 +29,13 @@ bool read_CCS811_register(uint8_t reg_add, uint8_t *data, uint16_t data_len);
  */
 bool ccs811_init(void)
 {
-	ccs811_reset();
+	//ccs811_reset();
+
 	HAL_Delay(100);
 	uint8_t id=0;
 
 	// check the Register HW ID by making a call, ensuring i2C bus is connected.
-	if (read_CCS811_register(CCS811_REG_HW_ID, &id, 1))
+	if (!read_CCS811_register(CCS811_REG_HW_ID, &id, 1))
 	{
 		return false;
 	}
@@ -45,7 +47,7 @@ bool ccs811_init(void)
 	}
 
 	// write NULL into the bootloader
-	(void)write_CCS811_register(CCS811_BOOTLOADER_APP_START, NULL, 0);
+	set_app_start();
 
 	// set the measurement cycle rate to .25 seconds
 	set_measurement_mode(CCS811_MODE_250ms);
@@ -56,6 +58,17 @@ bool ccs811_init(void)
 
 	// made it here, so we're good
 	return true;
+}
+
+void set_app_start()
+{
+	uint8_t data[1];
+	data[0]= CCS811_BOOTLOADER_APP_START;
+	HAL_StatusTypeDef i2c_tx_okay = HAL_I2C_Master_Transmit(&hi2c1, CCS811_I2C_ADDRESS1, data, 1, 100);
+	if (i2c_tx_okay != HAL_OK)
+	{
+		// handle the error
+	}
 }
 
 void ccs811_reset()
@@ -69,10 +82,7 @@ bool ccs811_check_data_ready()
 	bool isReady = false;
 	uint8_t status = 0;
 	(void)read_CCS811_register(CCS811_REG_STATUS, &status, 1);
-	if((status >> 3) & 0x01)
-	{
-		isReady = true;
-	}
+	isReady = ((status >> 3) & 0x01) != 0;
 	return isReady;
 }
 

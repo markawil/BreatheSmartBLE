@@ -86,15 +86,16 @@ void MX_I2C1_Init(void)
 	  // TODO: handle init error for mpu6050
   }
 
-//  	while(ccs811_init() == false)
-//  	{
-//  		HAL_Delay(1000); // wait and keep trying to init until device ready
-//  		ccs811_init_count++;
-//  		if (ccs811_init_count > 5) // try 5 times in 5 seconds otherwise move on.
-//  		{
-//  			break;
-//  		}
-//  	}
+  while(ccs811_init() == false)
+  {
+	  HAL_Delay(1000); // wait and keep trying to init until device ready
+	  ccs811_init_count++;
+	  if (ccs811_init_count > 5) // try 5 times in 5 seconds otherwise move on.
+	  {
+		  // TODO: handle init error for ccs811
+		  break;
+	  }
+  }
 
   	//  if (bme280_init() == false)
   	//  {
@@ -342,15 +343,14 @@ void pollBME280() {
 
 	float humidity = 35.0;
 	float pressure = 26.75;
-/*
- *  use when BME280 sensor is setup and working
-	struct bme280_uncomp_data bme280_data;
-	bme280_load_temp_pressure_humidity(&bme28_data);
+//
+//	/* use when BME280 sensor is setup and working */
+//	struct bme280_uncomp_data bme280_data;
+//	bme280_load_temp_pressure_humidity(&bme28_data);
+//
+//	humidity = (float)bme280_data.humidity;
+//	pressure = (float)bme280_data.pressure;
 
-	humidity = (float)bme280_data.humidity;
-	pressure = (float)bme280_data.pressure;
- *
- */
 
 	hm10_uart_send_tx((float)humidity, SENSOR_DATA_HUM);
 	hm10_uart_send_tx((float)pressure, SENSOR_DATA_PRES);
@@ -358,18 +358,18 @@ void pollBME280() {
 
 void pollCCS811()
 {
-	uint16_t co2 = 400;
+	// default values for testing
+	uint16_t co2 = 250;
 	uint16_t tvoc = 25;
 
-	/* Use when the CCS811 sensor is working right.
-	if (ccs811_check_data_ready() && (ccs811_init_count < 6))
+	// Use when the CCS811 sensor is working right.
+	if ((ccs811_init_count < 6) && ccs811_check_data_ready())
 	{
 		co2 = ccs811_get_CO2_PPM();
 		tvoc = ccs811_get_TVOC_PPB();
-		write_baseline(0x447B);
-		HAL_Delay(250);
+//		write_baseline(0x447B);
+//		HAL_Delay(250);
 	}
-	*/
 
 	ssd1306_set_LCD(LCD_NUMBER_1);
 
